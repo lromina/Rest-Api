@@ -6,14 +6,34 @@ class LibroController{
         res.json(result);// respuesta que le damos al cliente
     }
 
+    //Añadir un Nuevo Libro
     async add(req, res){
         const libro = req.body; // permite obtener la solicitud de la carga de usuario
-        const [result] = await pool.query (`INSERT INTO libros (nombre, autor, categoria, anioPublicacion, ISBN) VALUES (?,?,?,?,?)`, [libro.nombre, libro.autor, libro.categoria, libro.anioPublicacion, libro.ISBN]);
-        res.json({"Id Insertado": result.insertId});
+        try {
+            const [result] = await pool.query (`INSERT INTO libros (nombre, autor, categoria, anioPublicacion, ISBN) VALUES (?,?,?,?,?)`, [libro.nombre, libro.autor, libro.categoria, libro.anioPublicacion, libro.ISBN]);
+            res.json({"Id Insertado": result.insertId});
+        } catch (error) {
+            res.status(404).json({ Error: 'Datos Inexistentes o Duplicados', Id: libro});
+
+
+            //if (error instanceof TypeError) {
+              //  console.log("Error de Tipo")
+            //}
+            //if (error instanceof SyntaxError) {
+              //  console.log("Error de Sintaxis")
+            //}
+            //if (error instanceof ReferenceError) {
+              //  console.log("Error de Referencia")
+            //}
+            
+        }
+        
     }
+
+
     async delete(req, res){
         const libro = req.body; 
-        const [result] = await pool.query (`DELETE FROM libros WHERE id=(?)`, [libro.id]);
+        const [result] = await pool.query (`DELETE FROM libros WHERE ISBN=(?)`, [libro.ISBN]);
         res.json({"Registro Eliminado": result.affectedRows});
     }
 
