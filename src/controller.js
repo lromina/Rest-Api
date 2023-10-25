@@ -67,8 +67,37 @@ class LibroController{
     //Modificar un Registro
     async update(req, res){
         const libro = req.body; 
-        const [result] = await pool.query (`UPDATE libros SET nombre =(?), autor=(?), categoria=(?), anioPublicacion=(?), ISBN=(?) WHERE id=(?)`, [libro.nombre, libro.autor, libro.categoria, libro.anioPublicacion, libro.ISBN, libro.id]);
-        res.json({"Registro Modificado": result.changedRows});
+        const schema = {
+          nombre: String,
+          autor: String,
+          categoria: String,
+          anioPublicacion: Date,
+          ISBN: String,
+        
+        };
+      
+        try {
+          for (const atributo in libro) {
+            if (!schema.hasOwnProperty(atributo)) {
+            // El atributo no existe en el schema
+              res.status(400).json({ Error: `El atributo ${atributo} no existe` });
+              return;
+            }
+          }
+          const [existeLibro] = await pool.query(
+            `SELECT * FROM libros WHERE ISBN = ?`,[libro.ISBN]);
+
+            if (existeLibro.length > 0) {
+              const [result] = await pool.query (`UPDATE libros SET nombre =(?), autor=(?), categoria=(?), anioPublicacion=(?) WHERE ISBN=(?)`, [libro.nombre, libro.autor, libro.categoria, libro.anioPublicacion, libro.ISBN]);
+              res.json({"Registro Modificado": result.changedRows});       
+          } else {
+            res.status(404).json({ Error: 'Libro no encontrado' });         
+
+          }
+        } catch (error) {
+          res.status(500).json({ Error: 'Error en los datos de la base' });
+        }
+
     }
 
     //Obtener un Registro
@@ -94,14 +123,6 @@ export const libro = new LibroController();
 
 
 
-  //if (error instanceof TypeError) {
-              //  console.log("Error de Tipo")
-            //}
-            //if (error instanceof SyntaxError) {
-              //  console.log("Error de Sintaxis")
-            //}
-            //if (error instanceof ReferenceError) {
-              //  console.log("Error de Referencia")
-            //}
+ 
             
   
