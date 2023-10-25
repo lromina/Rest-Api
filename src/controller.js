@@ -51,9 +51,12 @@ class LibroController{
     async delete(req, res){
         const libro = req.body;
         try {
-          const [result] = await pool.query (`DELETE FROM libros WHERE ISBN=(?)`, [libro.ISBN]);
-          if (result.length > 0) {
-            res.json({"Registro Eliminado": result.affectedRows});
+          const [existeLibro] = await pool.query(
+            `SELECT * FROM libros WHERE ISBN = ?`,[libro.ISBN]);
+
+          if (existeLibro.length > 0) {
+              const [result] = await pool.query (`DELETE FROM libros WHERE ISBN=(?)`, [libro.ISBN]);
+              res.json({"Registro Eliminado": result.affectedRows});
           } else {
             res.status(404).json({ Error: 'Libro no encontrado', libro});
           }
@@ -61,6 +64,7 @@ class LibroController{
         } catch (error) {
           res.status(404).json({ Error: 'No es posible eliminar el Registro', Id: libro});
         } 
+        
         
     }
 
