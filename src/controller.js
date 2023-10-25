@@ -9,6 +9,7 @@ class LibroController{
     //Añadir un Nuevo Libro
     async add(req, res){
         const libro = req.body; // permite obtener la solicitud de la carga de usuario
+        //El objeto schema es un objeto JSON que contiene una lista de los atributos permitidos, junto con su tipo de dato.
         const schema = {
             nombre: String,
             autor: String,
@@ -62,7 +63,7 @@ class LibroController{
           }
           
         } catch (error) {
-          res.status(404).json({ Error: 'No es posible eliminar el Registro', Id: libro});
+          res.status(404).json({ Error: 'No es posible eliminar el Registro'});
         } 
         
         
