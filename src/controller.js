@@ -109,13 +109,21 @@ class LibroController{
     async getOne(req, res) {
         const libro = req.params.id; // Obtenemos el ID de la URL
         //const libro = req.body.id; // obtenemos el Id cargando en el body
-        const [result] = await pool.query('SELECT * FROM libros WHERE id = ?', [libro]);
 
+        try {
+          const [result] = await pool.query('SELECT * FROM libros WHERE id = ?', [libro]);
+          
         if (result.length > 0) {
-            res.json(result[0]);
-          } else {
-            res.status(404).json({ Error: 'Libro no encontrado', Id: libro});
-          }
+          res.json(result[0]);
+        } else {
+          res.status(404).json({ Error: 'Libro no encontrado', Id: libro});
+        }
+
+        } catch (error) {
+          res.status(500).json({ Error: 'Error en los datos de la base' });
+        }
+        
+
       }
     
 
